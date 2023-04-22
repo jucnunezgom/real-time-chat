@@ -67,7 +67,6 @@ io.on("connection", (socket) => {
 
   socket.on("chatroomMessage", async ({ chatroomId, message }) => {
     if (message.trim().length > 0) {
-      console.log(socket.userId);
       const user = await User.findOne({ _id: socket.userId });
       const newMessage = new Message({
         chatroom: chatroomId,

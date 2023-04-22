@@ -1,12 +1,26 @@
 import React from "react";
-import makeToast from "../Toaster";
 import axios from "axios";
 import { withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const LoginPage = (props) => {
   const emailRef = React.createRef();
   const passwordRef = React.createRef();
   const [chatrooms, setChatrooms] = React.useState([]);
+
+  React.useEffect(() => {
+    const room = localStorage.getItem("CC_Chatroom");
+    if (room) {
+      props.history.push("/chatroom/" + room);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (chatrooms.length === 0) return;
+    localStorage.setItem("CC_Chatroom", chatrooms[0]._id);
+    props.history.push(`/chatroom/${chatrooms[0]._id}`);
+    props.setupSocket();
+  }, [chatrooms]);
 
   const loginUser = () => {
     const email = emailRef.current.value;
@@ -18,7 +32,6 @@ const LoginPage = (props) => {
         password,
       })
       .then((response) => {
-        // makeToast("success", response.data.message);
         localStorage.setItem("CC_Token", response.data.token);
 
         axios
@@ -31,11 +44,8 @@ const LoginPage = (props) => {
             setChatrooms(response.data);
           })
           .catch((err) => {
-            setTimeout(getChatrooms, 3000);
+            // console.log(err);
           });
-
-        props.history.push(`/chatroom/${chatrooms[0]._id}`);
-        props.setupSocket();
       })
       .catch((err) => {
         if (
@@ -44,8 +54,8 @@ const LoginPage = (props) => {
           err.response.data &&
           err.response.data.message
         ) {
+          // console.log(err);
         }
-        // makeToast("error", err.response.data.message);
       });
   };
 
@@ -73,6 +83,7 @@ const LoginPage = (props) => {
           />
         </div>
         <button onClick={loginUser}>Login</button>
+        <Link to="/register">Register</Link>
       </div>
     </div>
   );

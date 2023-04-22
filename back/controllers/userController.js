@@ -5,7 +5,6 @@ const jwt = require("jwt-then");
 
 exports.register = async (req, res) => {
   const { name, email, password, username, type } = req.body;
-  console.log(req.body);
 
   const emailRegex = /@gmail.com|@yahoo.com|@hotmail.com|@live.com/;
   const usernameRegex = /^[a-zA-Z]+$/;
@@ -13,7 +12,7 @@ exports.register = async (req, res) => {
   if (!emailRegex.test(email)) throw "Email is not supported from your domain.";
   if (password.length < 6) throw "Password must be atleast 6 characters long.";
   if (!usernameRegex.test(username)) throw "Invalid Username.";
-  if (type !== "student") throw "Invalid user type.";
+  if (!["student", "admin"].includes(type)) throw "Invalid user type.";
 
   const userExists = await User.findOne({
     email,

@@ -32,6 +32,7 @@ exports.getAllChatrooms = async (req, res) => {
     });
 
     await chatroom.save();
+    chatrooms.push(chatroom);
   }
 
   res.json(chatrooms);

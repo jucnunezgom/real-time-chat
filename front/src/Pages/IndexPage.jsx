@@ -2,12 +2,13 @@ import React from "react";
 
 const IndexPage = (props) => {
   React.useEffect(() => {
-    const token = localStorage.getItem("CC_Token");
-    if (!token) {
+    const room = localStorage.getItem("CC_Chatroom");
+    if (room) {
+      props.history.push("/chatroom/" + room);
+    } else {
       props.history.push("/login");
     }
-    // eslint-disable-next-line
-  }, [0]);
+  }, []);
   return <div></div>;
 };
 

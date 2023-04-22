@@ -1,18 +1,27 @@
 import React from "react";
 import axios from "axios";
-import makeToast from "../Toaster";
+import { Link } from "react-router-dom";
 
 const RegisterPage = (props) => {
   const nameRef = React.createRef();
   const emailRef = React.createRef();
   const passwordRef = React.createRef();
   const usernameRef = React.createRef();
+  const typeRef = React.createRef();
 
-  const registerUser = (props) => {
+  React.useEffect(() => {
+    const room = localStorage.getItem("CC_Chatroom");
+    if (room) {
+      props.history.push("/chatroom/" + room);
+    }
+  }, []);
+
+  const registerUser = () => {
     const name = nameRef.current.value;
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
     const username = usernameRef.current.value;
+    const type = typeRef.current.value;
 
     axios
       .post("http://localhost:8000/user/register", {
@@ -20,14 +29,14 @@ const RegisterPage = (props) => {
         email,
         password,
         username,
-        type: "student",
+        type,
       })
       .then((response) => {
-        // makeToast("success", response.data.message);
         nameRef.current.value = "";
         emailRef.current.value = "";
         passwordRef.current.value = "";
         usernameRef.current.value = "";
+        typeRef.current.value = "";
         props.history.push("/login");
       })
       .catch((err) => {
@@ -37,8 +46,8 @@ const RegisterPage = (props) => {
           err.response.data &&
           err.response.data.message
         ) {
+          // console.log(err);
         }
-        // makeToast("error", err.response.data.message);
       });
   };
 
@@ -84,7 +93,17 @@ const RegisterPage = (props) => {
           ref={usernameRef}
         />
       </div>
+      <div className="inputGroup">
+        <label>
+          User Type:
+          <select name="type" ref={typeRef} style={{ marginLeft: "15px" }}>
+            <option value="student">Student</option>
+            <option value="admin">Admin</option>
+          </select>
+        </label>
+      </div>
       <button onClick={registerUser}>Register</button>
+      <Link to="/login">Login</Link>
     </div>
   );
 };

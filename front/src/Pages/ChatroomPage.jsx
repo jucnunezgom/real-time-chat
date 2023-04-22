@@ -3,12 +3,19 @@ import { withRouter } from "react-router-dom";
 import axios from "axios";
 // import io from "socket.io-client";
 
-const ChatroomPage = ({ match, socket, setupSocket }) => {
+const ChatroomPage = ({ match, socket, setupSocket, history }) => {
   const chatroomId = match.params.id;
   const [messages, setMessages] = React.useState([]);
   const messageRef = React.useRef();
   const [userId, setUserId] = React.useState("");
   const [userType, setUserType] = React.useState("");
+
+  const logout = () => {
+    localStorage.removeItem("CC_Token");
+    localStorage.removeItem("CC_Chatroom");
+    socket.emit("disconnect");
+    history.push("/login");
+  };
 
   const sendMessage = () => {
     if (socket) {
@@ -33,6 +40,8 @@ const ChatroomPage = ({ match, socket, setupSocket }) => {
       const payload = JSON.parse(atob(token.split(".")[1]));
       setUserId(payload.id);
       setUserType(payload.type);
+    } else {
+      history.push("/login");
     }
     if (socket) {
       socket.on("newMessage", (message) => {
@@ -40,7 +49,6 @@ const ChatroomPage = ({ match, socket, setupSocket }) => {
         setMessages(newMessages);
       });
     }
-    //eslint-disable-next-line
   }, [messages]);
 
   React.useEffect(() => {
@@ -128,6 +136,7 @@ const ChatroomPage = ({ match, socket, setupSocket }) => {
           </div>
         </div>
       </div>
+      <button onClick={logout}>Logout</button>
     </div>
   );
 };

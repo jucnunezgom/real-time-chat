@@ -5,12 +5,12 @@ import RegisterPage from "./Pages/RegisterPage";
 import IndexPage from "./Pages/IndexPage";
 import ChatroomPage from "./Pages/ChatroomPage";
 import io from "socket.io-client";
-import makeToast from "./Toaster";
 
 function App() {
   const [socket, setSocket] = React.useState(null);
 
   const setupSocket = () => {
+    if (socket) return;
     const token = localStorage.getItem("CC_Token");
     if (token && !socket) {
       const newSocket = io("http://localhost:8000", {
@@ -22,11 +22,11 @@ function App() {
       newSocket.on("disconnect", () => {
         setSocket(null);
         setTimeout(setupSocket, 3000);
-        console.log("Socket Disconnected!");
+        // console.log("Socket Disconnected!");
       });
 
       newSocket.on("connect", () => {
-        console.log("Socket Connected!");
+        // console.log("Socket Connected!");
       });
 
       setSocket(newSocket);
@@ -53,6 +53,10 @@ function App() {
             <ChatroomPage socket={socket} setupSocket={setupSocket} />
           )}
           exact
+        />
+        <Route
+          path="*"
+          render={() => <LoginPage setupSocket={setupSocket} />}
         />
       </Switch>
     </BrowserRouter>
